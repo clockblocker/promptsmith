@@ -1,5 +1,6 @@
 import type { Example } from "~/db";
 
+/** Input data for assembling an XML-formatted prompt. */
 interface PromptGeneratorInput {
 	agentRole: string;
 	schema: string;
@@ -8,6 +9,16 @@ interface PromptGeneratorInput {
 	userInput: Record<string, string>;
 }
 
+/**
+ * Assembles a complete XML-formatted prompt string from structured input.
+ *
+ * The output contains up to five XML sections in order:
+ * `<agent_role>`, `<schema_of_expected_result>`, `<examples>`, `<instructions>`, and `<user_input>`.
+ * Empty sections are omitted.
+ *
+ * @param input - The prompt components to assemble.
+ * @returns A multi-section XML string ready to send to an AI model.
+ */
 export function generateXmlPrompt(input: PromptGeneratorInput): string {
 	const parts: string[] = [];
 
@@ -53,6 +64,11 @@ export function generateXmlPrompt(input: PromptGeneratorInput): string {
 	return parts.join("\n\n");
 }
 
+/**
+ * Escapes XML special characters (`&`, `<`, `>`, `"`, `'`) in a string.
+ * @param str - Raw string to escape.
+ * @returns The XML-safe string.
+ */
 function escapeXml(str: string): string {
 	return str
 		.replace(/&/g, "&amp;")

@@ -1,29 +1,90 @@
-# Create T3 App
+# Promptsmith
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A local-first prompt engineering tool for designing, testing, and iterating on AI prompts.
 
-## What's next? How do I make an app with this?
+## Purpose
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+Promptsmith helps developers and prompt engineers craft better AI prompts through a structured workflow. All data stays on your machine — nothing is sent to external servers except when testing prompts against AI models.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Key Features
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- **Local-only data storage** — All projects, prompts, and versions are stored in IndexedDB via Dexie.js
+- **Project / Prompt / Version organization** — Hierarchical structure to manage prompt libraries
+- **Zod schema editor** — Monaco-powered editor for defining structured output schemas
+- **Real-time example validation** — Validate example outputs against your Zod schemas instantly
+- **Multi-model testing** — Test prompts against Gemini 2.5 Flash and GPT-4o Mini
+- **XML prompt format generation** — Generates prompts in XML format for consistent AI parsing
+- **Version forking** — Fork any version to iterate on prompts without losing history
 
-## Learn More
+## Getting Started
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+### Prerequisites
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+- [Node.js](https://nodejs.org/) (v20+) or [Bun](https://bun.sh/)
+- An API key for at least one supported model (OpenAI or Google Gemini)
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+### Installation
 
-## How do I deploy this?
+```bash
+git clone <repo-url>
+cd promptsmith
+bun install    # or: npm install
+```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+### Development
+
+```bash
+bun dev        # or: npm run dev
+```
+
+The app runs at `http://localhost:3000` by default.
+
+### Other Commands
+
+| Command | Description |
+|---------|-------------|
+| `bun run build` | Production build |
+| `bun run start` | Start production server |
+| `bun run typecheck` | Run TypeScript type checking |
+| `bun run check` | Lint and format with Biome |
+| `bun run test:e2e` | Run Playwright end-to-end tests |
+
+## Architecture
+
+```
+src/
+├── app/                 # Next.js App Router pages
+│   └── [projectSlug]/   # Dynamic routes: project → prompt → version
+├── components/          # React components
+│   ├── editor/          # Prompt editing UI (role, instructions, schema, examples)
+│   ├── projects/        # Project CRUD
+│   ├── prompts/         # Prompt CRUD
+│   ├── versions/        # Version management
+│   ├── settings/        # API key configuration
+│   ├── layout/          # Header and layout
+│   └── ui/              # shadcn/ui primitives
+├── db/                  # Dexie.js database layer
+│   ├── index.ts         # Schema definitions and db instance
+│   └── hooks/           # React hooks for each entity (projects, prompts, versions, results, settings)
+└── lib/                 # Shared utilities
+    ├── ai/              # Vercel AI SDK integration (model registry, generate)
+    ├── prompt-generator.ts  # XML prompt assembly
+    ├── zod-validator.ts     # Runtime Zod schema parsing and validation
+    └── utils.ts             # Class-name merging and slug generation
+```
+
+### Data Model
+
+Projects contain Prompts, which contain Versions. Each Version holds a Zod schema, examples, instructions, and an agent role. Results are produced by running a Version against a model.
+
+### Tech Stack
+
+- **Framework**: Next.js 15 (App Router, Turbopack)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Database**: Dexie.js (IndexedDB wrapper)
+- **UI Components**: shadcn/ui + Radix UI
+- **Code Editor**: Monaco Editor
+- **AI Integration**: Vercel AI SDK
+- **Linting / Formatting**: Biome
+- **E2E Testing**: Playwright
