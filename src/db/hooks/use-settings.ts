@@ -2,6 +2,7 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "~/db";
+import { emit } from "~/lib/events";
 
 export type SettingKey = "openai_api_key" | "gemini_api_key";
 
@@ -34,6 +35,7 @@ export async function setSetting(
 			value,
 		});
 	}
+	emit("setting:updated", { key, value });
 }
 
 export async function getSetting(key: SettingKey): Promise<string | undefined> {

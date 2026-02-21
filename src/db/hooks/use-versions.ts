@@ -2,6 +2,7 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Example, type Version } from "~/db";
+import { emit } from "~/lib/events";
 
 export function useVersions(promptId: string | undefined) {
 	const versions = useLiveQuery(
@@ -79,6 +80,7 @@ export async function createVersion(
 	};
 
 	await db.versions.add(version);
+	emit("version:created", { version });
 	return version;
 }
 
@@ -89,11 +91,13 @@ export async function updateVersion(
 	>,
 ): Promise<void> {
 	await db.versions.update(id, updates);
+	emit("version:updated", { versionId: id, updates });
 }
 
 export async function deleteVersion(id: string): Promise<void> {
 	await db.results.where("versionId").equals(id).delete();
 	await db.versions.delete(id);
+	emit("version:deleted", { versionId: id });
 }
 
 export function createExample(): Example {
