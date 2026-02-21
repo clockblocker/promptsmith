@@ -2,6 +2,7 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Result } from "~/db";
+import { emit } from "~/lib/events";
 
 export function useResults(versionId: string | undefined) {
 	const results = useLiveQuery(
@@ -36,6 +37,7 @@ export async function createResult(
 	};
 
 	await db.results.add(result);
+	emit("result:created", { result });
 	return result;
 }
 

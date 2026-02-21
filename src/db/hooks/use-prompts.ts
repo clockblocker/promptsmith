@@ -2,6 +2,7 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Prompt } from "~/db";
+import { emit } from "~/lib/events";
 import { slugify } from "~/lib/utils";
 
 export function usePrompts(projectId: string | undefined) {
@@ -51,6 +52,7 @@ export async function createPrompt(
 	};
 
 	await db.prompts.add(prompt);
+	emit("prompt:created", { prompt });
 	return prompt;
 }
 
@@ -61,4 +63,5 @@ export async function deletePrompt(id: string): Promise<void> {
 	}
 	await db.versions.where("promptId").equals(id).delete();
 	await db.prompts.delete(id);
+	emit("prompt:deleted", { promptId: id });
 }

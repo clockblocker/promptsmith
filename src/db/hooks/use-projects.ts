@@ -2,6 +2,7 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Project } from "~/db";
+import { emit } from "~/lib/events";
 import { slugify } from "~/lib/utils";
 
 export function useProjects() {
@@ -32,6 +33,7 @@ export async function createProject(name: string): Promise<Project> {
 	};
 
 	await db.projects.add(project);
+	emit("project:created", { project });
 	return project;
 }
 
@@ -49,4 +51,5 @@ export async function deleteProject(id: string): Promise<void> {
 	}
 	await db.prompts.where("projectId").equals(id).delete();
 	await db.projects.delete(id);
+	emit("project:deleted", { projectId: id });
 }
